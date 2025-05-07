@@ -25,6 +25,8 @@ using namespace std::chrono;
     void startscreen();
     void clearstartscreen();
     void endscreen(int score);
+
+
 #define  random(x) (rand()%x)+1
 #pragma endregion
 
