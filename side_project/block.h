@@ -21,7 +21,7 @@ bool L(vector<vector<string>>& tmp, vector<vector<string>>& v) {
 		tmp[1][4] = "L";
 		tmp[1][5] = "L";
 		tmp[1][6] = "L";
-		tmp[2][6] = "L";
+		tmp[2][4] = "L";
 		return 1;
 	}
 	else {
