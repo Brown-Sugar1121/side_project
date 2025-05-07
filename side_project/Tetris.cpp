@@ -9,7 +9,8 @@
 #include <string>
 using namespace std;
 using namespace std::chrono;
-
+//(0,2)->(int x = 34; int y = 6;)
+int const leftx = 80, topy = 14;
 #pragma region Function Declaration
 
     void frame(void);
@@ -18,6 +19,7 @@ using namespace std::chrono;
     bool left(vector<vector<string>>& v, vector<vector<string>>& tmp, int x, int y,int &outside);
     bool check(vector<vector<string>>&v, int x, int y);
     void print(string text, int color);
+    void printnextblock(vector<vector<string>>& v, vector<vector<string>>& tmp, int saveblock);
     bool tostop(vector<vector<string>>& v, vector<vector<string>>& tmp, int x, int y);
     int  clear(vector<vector<string>>& v);
     int setcolor(vector<vector<string>>&v, vector<vector<string>>&tmp, int i, int j);
@@ -25,20 +27,23 @@ using namespace std::chrono;
     void startscreen();
     void clearstartscreen();
     void endscreen(int score);
+
+
 #define  random(x) (rand()%x)+1
 #pragma endregion
 
-
+    
 int main() { 
     auto lastTime = steady_clock::now();
     srand(time(0));
     startscreen();
-    int headline = 10;
+    int headline = 10 , saveblock = random(7);
     while (1) {
         auto now = steady_clock::now();            //間閣下落
         auto elapsed = duration_cast<milliseconds>(now - lastTime).count();
+        //閃爍標題
         if (elapsed >= 100) {
-            gotoxy(11, 4);   print("       TETRIS CONSOLE         ", headline);
+            gotoxy(60 + 11, 12 + 4);   print("       TETRIS CONSOLE         ", headline);
             headline++;
             if (headline > 15)headline = 10;
             lastTime = now;
@@ -64,13 +69,18 @@ int main() {
             int x = 3, y = 0, cc = clear(v), sec = 0, outside = 0;
             bool b = 1, ctu = 1, display = 0;
             score += cc;
-            gotoxy(15, 3); print(to_string(score), 14);
+            gotoxy(leftx + 14, topy + 2+6); print("Score：", 14);
+            gotoxy(leftx +14, topy +3 + 6); print(to_string(score), 7);
             if (cc != 0) {
                 print("+", 12);
                 print(to_string(cc), 12);
                 display = 1;
             }
-            switch (random(7)) {
+            int newblock = saveblock;
+            saveblock = random(7);
+            printnextblock(v, tmp, saveblock);
+
+            switch (newblock) {
             case 1:
                 ctu = I(tmp, v);
                 break;
@@ -94,14 +104,15 @@ int main() {
                 break;
             }
             if (ctu == 0)break;
+            
             bool tr = 1;
             while (1) {
-                auto now = steady_clock::now();            //間閣下落
+                auto now = steady_clock::now();            //間閣下落█■
                 auto elapsed = duration_cast<milliseconds>(now - lastTime).count();
                 for (int i = 0; i < v.size(); i++) {
                     for (int j = 0; j < v[0].size(); j++) {
-                        gotoxy(j + 1, i);
-                        if (tmp[i][j] != " " || v[i][j] != " ")print("█", setcolor(v, tmp, i, j));
+                        gotoxy(leftx + j + 1, topy + i);
+                        if (tmp[i][j] != " " || v[i][j] != " ")print("#", setcolor(v, tmp, i, j));
                         else cout << " ";
                     }
                 }
@@ -112,7 +123,7 @@ int main() {
                         if (score >= 100)k = 3;
                         else if (score >= 10)k = 2;
                         else k = 1;
-                        gotoxy(15 + k, 3);
+                        gotoxy(leftx + 14 + k, topy + 3 + 6);
                         cout << "          ";
                     }
                     else {
@@ -175,7 +186,7 @@ int main() {
             auto now = steady_clock::now();            //間閣下落
             auto elapsed = duration_cast<milliseconds>(now - lastTime).count();
             if (elapsed >= 100 ) {
-                gotoxy(11, 6);   print("          GAME OVER           ", k);
+                gotoxy(60 + 11, 12 + 6);   print("          GAME OVER           ", k);
                 lastTime = now;
                 k++;
                 if (k > 15)k = 10;
@@ -200,12 +211,69 @@ int main() {
 
 
 
+void printnextblock(vector<vector<string>>& v, vector<vector<string>>& tmp, int saveblock) {
+    switch (saveblock) {
+    case 1:
+        I(tmp, v);
+        break;
+    case 2:
+        L(tmp, v);
+        break;
+    case 3:
+        J(tmp, v);
+        break;
+    case 4:
+        O(tmp, v);
+        break;
+    case 5:
+        T(tmp, v);
+        break;
+    case 6:
+        S(tmp, v);
+        break;
+    case 7:
+        Z(tmp, v);
+        break;
+    }
+    gotoxy(leftx + 10+3 , topy + 2); print("Upcoming", 11);
+    for (int j = 3; j < 11; j++) {//15
+        gotoxy(leftx + 10 + j, topy +3 ); print("■", 7);
+        /*if (j == 3 || j == 10)print("▓", 7);
+        else *print("■：", 7);*/
+        gotoxy(leftx + 10 + j, topy + 2+5);
+        /*if (j == 3 || j == 10)print("▓", 7);
+        else */print("■", 7);
+    }
+    for (int j = 2; j < 5; j++) {//15
+        gotoxy(leftx + 10+3 , topy + 2 + j); print("▓", 7);
+        gotoxy(leftx + 10+10 , topy + 2  +j); print("▓", 7);
+    }
 
+
+    int a = saveblock==1?1: 0;
+
+    for (int i = 1; i < 3 ; i++) {
+        for (int j = 3; j < 7; j++) {
+            gotoxy(leftx + 12 + j, topy + 3 + i);
+            if (tmp[i-a][j] != " ") {
+                
+                print("#", setcolor(v, tmp, i-a, j));
+            }
+            else cout << " ";
+        }
+    }
+    for (int i = 0; i < 4; i++) {
+        for (int j = 3; j < 7; j++) {
+            tmp[i][j]=" ";
+        }
+    }
+    return;
+}
 
 #pragma region Function
-void endscreen(int score) {
-    int x = 10;
-    int y = 5;
+void endscreen( int score) {
+    int x = 60 + 10;
+    int y = 12 + 5;
     int w = 30;
     gotoxy(x, y);       print("╔══════════════════════════════╗", 13);
     gotoxy(x, y + 1);   print("║                              ║", 13);
@@ -235,14 +303,14 @@ void endscreen(int score) {
 
 void clearstartscreen() {
     for (int row = 1; row <= 20; row++) {
-        gotoxy(0, row);
+        gotoxy(60 + 0, 12 + row);
         cout << string(60, ' ');
     }
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
 }
 void startscreen() {
-    int x = 10;
-    int y = 3;
+    int x = 34+26 +10;
+    int y = 12 + 3;
 
     gotoxy(x, y);       print("╔══════════════════════════════╗", 13);
     gotoxy(x, y + 1);   print("║       TETRIS CONSOLE         ║", 13);
@@ -432,17 +500,14 @@ int setcolor(vector<vector<string>>& v, vector<vector<string>>& tmp, int i, int 
 }
 void frame(void) {
     for (int i = 0; i < 12; i++) {
-        gotoxy(0, i+2);
-        cout << "l";
-        gotoxy(11, i + 2);
-        cout << "l";
-        gotoxy(i, 12 + 2);
-        if (i == 0  || i == 11) {
-            cout << "■";
-        }
-        else {
-            cout << "■";
-        }
+        gotoxy(leftx, i+ topy+2);
+        cout << "▓";
+        gotoxy(leftx+11, i+ topy + 2);
+        cout << "▓";
+        gotoxy(i+ leftx, 12+ topy + 2);
+        if(i==0||i==11)cout << "▓";
+        else cout << "■";
+       
     }
 }
 bool check(vector<vector<string>>& v, int x, int y) {
