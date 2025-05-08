@@ -34,7 +34,9 @@ int const leftx = 80, topy = 14;
 
     
 int main() { 
-    auto lastTime = steady_clock::now();
+    auto lastTime = steady_clock::now(), lastpushW=steady_clock::now(), lastpushA = steady_clock::now();
+    auto lastpushS = steady_clock::now(),lastpushD = steady_clock::now(),lastpushSP=steady_clock::now();
+    bool pressA = 0, pressW = 0, pressS = 0, pressD = 0, pressSP = 0;
     srand(time(0));
     startscreen();
     int headline = 10 , saveblock = random(7);
@@ -59,12 +61,17 @@ int main() {
     bool endgane = 0;
     while (endgane == 0) {
         frame();
+        
         Sleep(1000);
         vector<vector<string>>v(14, vector<string>(10, " "));
         vector<vector<string>>tmp(14, vector<string>(10, " "));
         int score = 0;
         //
-
+        gotoxy(leftx + 18, topy + 11); print("D", 7);
+        gotoxy(leftx + 16, topy + 10); print("W", 7);
+        gotoxy(leftx + 16, topy + 11); print("S", 7);
+        gotoxy(leftx + 14, topy + 11); print("A", 7);
+        gotoxy(leftx + 14, topy + 12); print("SPACE", 112);
         while (1) {
             int x = 3, y = 0, cc = clear(v), sec = 0, outside = 0;
             bool b = 1, ctu = 1, display = 0;
@@ -152,30 +159,65 @@ int main() {
                     if (c == 'd' || c == 'D') {
                         if (right(v, tmp, x, y) && x <= 5) {
                             x++;
-
                         }
+                        pressD = 1;
+                        lastpushD = steady_clock::now();
+                        gotoxy(leftx + 14+4, topy + 11); print("D", 207);
                     }
                     else if ((c == 'a' || c == 'A')) {
                         if (left(v, tmp, x, y, outside) && x >= -1) {
                             x--;
                         }
-
+                        pressA = 1;
+                        lastpushA = steady_clock::now();
+                        gotoxy(leftx + 14, topy + 11); print("A", 207);
                     }
                     else if (tr && (c == 'w' || c == 'W')) {
                         turnright(v, tmp, x, y);
-                        Sleep(100);
+                        gotoxy(leftx + 16, topy + 10); print("W", 207);
+                        pressW = 1;
+                        lastpushW = steady_clock::now();
                     }
                     else if (c == ' ') {
                         while (!tostop(v, tmp, x, y)) {
                             down(v, tmp, x, y, tr);
                             if (y < 9)y++;
                         }
+                        pressSP = 1;
+                        lastpushSP = steady_clock::now();
+                        gotoxy(leftx + 14, topy + 12); print("SPACE", 207);
                     }
                     else if (c == 's') {
                         sec = 900;
+                        pressS = 1;
+                        lastpushS = steady_clock::now();
+                        gotoxy(leftx + 14+2, topy + 11); print("S", 207);
                     }
 
                 }
+
+                    if (pressD && duration_cast<milliseconds>(now - lastpushD).count() > 300) {
+                        gotoxy(leftx + 18, topy + 11); print("D", 7);
+                        pressD = 0;
+                    }
+                    if (pressW && duration_cast<milliseconds>(now - lastpushW).count() > 300) {
+                        gotoxy(leftx + 16, topy + 10); print("W", 7);
+                        pressW = 0;
+                    }
+                    if (pressS && duration_cast<milliseconds>(now - lastpushS).count() > 300) {
+                        gotoxy(leftx + 16, topy + 11); print("S", 7);
+                        pressS = 0;
+                    }
+                    if (pressA && duration_cast<milliseconds>(now - lastpushA).count() > 300) {
+                        gotoxy(leftx + 14, topy + 11); print("A", 7);
+                        pressA = 0;
+                    }
+                    if (pressSP && duration_cast<milliseconds>(now - lastpushSP).count() > 300) {
+                        gotoxy(leftx + 14, topy + 12); print("SPACE", 112);
+                        pressSP = 0;
+                    }
+
+                
                 b = !tostop(v, tmp, x, y);
             }
         }
@@ -208,7 +250,9 @@ int main() {
     return 0;
 }
 
+void printkeybroad(vector<vector<string>>& v, vector<vector<string>>& tmp, int a) {
 
+}
 
 
 void printnextblock(vector<vector<string>>& v, vector<vector<string>>& tmp, int saveblock) {
@@ -507,8 +551,8 @@ void frame(void) {
         gotoxy(i+ leftx, 12+ topy + 2);
         if(i==0||i==11)cout << "▓";
         else cout << "■";
-       
     }
+    
 }
 bool check(vector<vector<string>>& v, int x, int y) {
     int c = 0;
