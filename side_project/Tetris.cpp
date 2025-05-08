@@ -14,6 +14,7 @@ int const leftx = 80, topy = 14;
 #pragma region Function Declaration
 
     void frame(void);
+    int turnright(vector<vector<string>>& v, vector<vector<string>>& tmp, int x, int y);
     bool down(vector<vector<string>>&v, vector<vector<string>>&tmp, int x, int y, bool& tr);
     bool right(vector<vector<string>>& v, vector<vector<string>>& tmp, int x, int y);
     bool left(vector<vector<string>>& v, vector<vector<string>>& tmp, int x, int y,int &outside);
@@ -173,7 +174,7 @@ int main() {
                         gotoxy(leftx + 14, topy + 11); print("A", 207);
                     }
                     else if (tr && (c == 'w' || c == 'W')) {
-                        turnright(v, tmp, x, y);
+                        x += turnright(v, tmp, x, y);
                         gotoxy(leftx + 16, topy + 10); print("W", 207);
                         pressW = 1;
                         lastpushW = steady_clock::now();
@@ -195,7 +196,6 @@ int main() {
                     }
 
                 }
-
                     if (pressD && duration_cast<milliseconds>(now - lastpushD).count() > 300) {
                         gotoxy(leftx + 18, topy + 11); print("D", 7);
                         pressD = 0;
@@ -575,6 +575,69 @@ void print(string text, int color) {
     cout << text;
     SetConsoleTextAttribute(h, 7);
 }
+int turnright(vector<vector<string>>& v, vector<vector<string>>& tmp, int x, int y) {
 
+    int a = 0,ox=0;
+    /*if (x < 0) {
+        a = x;
+        x = 0;
+    }*/
+    if (x >= 6) {
+        x = 6;
+    }
+    if (y + 4 > v.size())y = v.size() - 4;
+    for (int i = y; i < y + 4; i++) {
+        for (int j = x; j < x + 4; j++) {
+            if (j < 0)continue;
+            if (tmp[i][j] == "O")return 0;
+        }
+    }
+    vector<vector<string>> tmp1=tmp;
+    vector<vector<string>> tmp2(14, vector<string>(10, " "));
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            if (x + j < 0)continue;
+            if (tmp[y + i][x + j] != " ") {
+                int ny = y + j, nx = x + a + 3 - i;
+                while (nx < 0) {
+                    if (!right(v, tmp1, x, y))return 0;
+                    ox++;
+                    nx++;
+                    x++;
+                    if (nx >= 0) {
+                        j--; continue;
+                    }
+                    
+                }
+                if ((ny < 0 || nx < 0 || ny >= tmp2.size() || nx >= tmp2[0].size()))return 0;
+            }
+        }
+    }
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            if (x + j < 0)continue;
+            if(tmp1[y + i][x + j]!=" ")
+            tmp2[y + j][x + 3 - i] = tmp1[y + i][x + j];
+        }
+    }
+    for (int i = y; i < y + 4; i++) {
+        for (int j = x; j < x + 4; j++) {
+            if ( j < 0)continue;
+            if (tmp2[i][j] != " " && v[i][j] != " ") {
+                return 0;
+            }
+        }
+    }
+
+    tmp = tmp2;
+    /*for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            tmp[y + i][x + j] = tmp2[y + i][x + j];
+        }
+
+    }*/
+
+    return ox ;
+}
 
 #pragma endregion
