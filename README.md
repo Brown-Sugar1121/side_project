@@ -28,7 +28,7 @@
 ## 📸 遊戲畫面
 ![image](https://github.com/user-attachments/assets/92939e00-22b1-488b-afb8-74d6c1624c69)
 ---
-![image](https://github.com/user-attachments/assets/bbf7376c-7480-4e2c-a04b-066b1ff3fbc8)
+![image](https://github.com/user-attachments/assets/a59540bc-61dc-425e-8900-3aa5fc165e08)
 ---
 ![image](https://github.com/user-attachments/assets/869e57de-4715-4f0a-9f34-9e5e1a4a3af1)
 ---
